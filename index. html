@@ -272,7 +272,7 @@
       <!-- LEFT COLUMN -->
       <div class="left">
         <div class="name" id="r_name">Your Name</div>
-        <p id="r_headline">Your Headline</p>
+        <p id="r_headline">Your Headline </p>
         <hr>
 
         <div class="section">

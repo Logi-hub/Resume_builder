@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ATS-Friendly Resume Builder (Free)</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    :root {
+      --primary: #0066cc;
+      --light-blue: #eaf2ff;
+      --dark: #222;
+      --line: #ccc;
+      --bg: #f4f7fa;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: var(--bg);
+      color: var(--dark);
+    }
+    header {
+      background: var(--primary);
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      font-weight: 600;
+    }
+    .wrap {
+      padding: 1rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .card {
+      background: white;
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,.05);
+    }
+    h2 {
+      margin: 0 0 .75rem;
+      font-size: 1.05rem;
+      color: var(--primary);
+      text-transform: uppercase;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 0.7rem;
+      margin-bottom: 0.2rem;
+      font-size: .9rem;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    textarea {
+      min-height: 80px;
+    }
+    .btn {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      padding: 0.9rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      margin-top: 1rem;
+      cursor: pointer;
+    }
+    .btn.outline {
+      background: transparent;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+    .btn.small {
+      width: auto;
+      padding: .45rem .8rem;
+      font-size: .85rem;
+      margin: .5rem 0 0;
+    }
+    .hidden {
+      display: none;
+    }
+
+    /* Resume Preview */
+    .resume {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      width: 900px;
+      margin: 0 auto;
+      background: white;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    .left {
+      background: var(--light-blue);
+      padding: 1rem 1.2rem;
+      word-wrap: break-word;
+      white-space: normal;
+    }
+    .right {
+      padding: 1rem 1.2rem;
+    }
+    .name {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    h3 {
+      color: var(--primary);
+      font-size: 1rem;
+      margin: 0 0 .5rem;
+      text-transform: uppercase;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid var(--line);
+      margin: 0.5rem 0 1rem;
+    }
+    ul {
+      margin: 0;
+      padding-left: 1.2rem;
+    }
+    li {
+      font-size: 0.9rem;
+      margin-bottom: 0.3rem;
+    }
+    p {
+      font-size: 0.9rem;
+      margin: 0.3rem 0;
+    }
+    .icon {
+      margin-right: 5px;
+      color: var(--primary);
+      font-size: 1rem;
+    }
+    .section {
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .date {
+      float: right;
+      color: #666;
+      font-size: .85rem;
+    }
+
+    @media print {
+      body { background: white; }
+      .resume {
+        width: 100%;
+        box-shadow: none;
+      }
+      .btn, .card { display: none; }
+    }
+  </style>
+</head>
+<body>
+<header>ATS-Friendly Resume Builder (Free)</header>
+
+<div class="wrap">
+
+  <!-- ===== FORM ===== -->
+  <div class="card">
+    <h2>Basic Info</h2>
+    <label>Full Name</label>
+    <input id="f_name" placeholder="Enter your name" />
+    <label>Headline</label>
+    <input id="f_headline" placeholder="e.g. Biomedical Engineer" />
+    <label>Phone</label>
+    <input id="f_phone" placeholder="Enter your phone number" />
+    <label>Email</label>
+    <input id="f_email" placeholder="Enter your email" />
+    <label>Location</label>
+    <input id="f_location" placeholder="Enter your location" />
+    <label>GitHub</label>
+    <input id="f_github" placeholder="Enter GitHub link (optional)" />
+    <label>LinkedIn</label>
+    <input id="f_linkedin" placeholder="Enter LinkedIn link (optional)" />
+    <label>Summary</label>
+    <textarea id="f_summary" placeholder="Write a short summary"></textarea>
+
+    <h2>Skills</h2>
+    <label>Technical Skills (comma separated)</label>
+    <textarea id="f_techskills" placeholder="e.g. Embedded C, IoT, Python, Java"></textarea>
+    <label>Soft Skills (comma separated)</label>
+    <textarea id="f_softskills" placeholder="e.g. Leadership, Problem Solving, Time Management"></textarea>
+    <label>Languages (comma separated)</label>
+    <textarea id="f_languages" placeholder="e.g. English, Tamil"></textarea>
+
+    <h2>Projects (min 2)</h2>
+    <!-- Project 1 -->
+    <label>Project 1 Title</label>
+    <input id="p1_title" placeholder="Project 1 Title" />
+    <label>Project 1 Timeline/Date</label>
+    <input id="p1_date" placeholder="e.g. Apr 2024" />
+    <label>Project 1 - Point 1</label>
+    <input id="p1_p1" placeholder="Description point 1" />
+    <label>Project 1 - Point 2</label>
+    <input id="p1_p2" placeholder="Description point 2" />
+
+    <hr style="border-top:1px dashed #ddd; margin:1rem 0;">
+
+    <!-- Project 2 -->
+    <label>Project 2 Title</label>
+    <input id="p2_title" placeholder="Project 2 Title" />
+    <label>Project 2 Timeline/Date</label>
+    <input id="p2_date" placeholder="e.g. Jan 2025" />
+    <label>Project 2 - Point 1</label>
+    <input id="p2_p1" placeholder="Description point 1" />
+    <label>Project 2 - Point 2</label>
+    <input id="p2_p2" placeholder="Description point 2" />
+
+    <!-- Project 3 (hidden initially) -->
+    <div id="project3_block" class="hidden">
+      <hr style="border-top:1px dashed #ddd; margin:1rem 0;">
+      <label>Project 3 Title</label>
+      <input id="p3_title" placeholder="Project 3 Title" />
+      <label>Project 3 Timeline/Date</label>
+      <input id="p3_date" placeholder="e.g. May 2025" />
+      <label>Project 3 - Point 1</label>
+      <input id="p3_p1" placeholder="Description point 1" />
+      <label>Project 3 - Point 2</label>
+      <input id="p3_p2" placeholder="Description point 2" />
+    </div>
+
+    <button class="btn outline small" type="button" onclick="toggleProject3()">+ Add Project 3</button>
+
+    <h2>Education</h2>
+    <textarea id="f_education" placeholder="e.g. B.E. Biomedical Engineering, 2021–2025"></textarea>
+
+    <h2>Course Work (comma separated)</h2>
+    <textarea id="f_coursework" placeholder="e.g. Biomedical Instrumentation, Medical Image Processing, IoT in Healthcare"></textarea>
+
+    <h2>Internships (min 2)</h2>
+    <!-- Internship 1 -->
+    <label>Internship 1 Title (Company – Role)</label>
+    <input id="i1_title" placeholder="JSP Hospital – Biomedical Intern" />
+    <label>Internship 1 Timeline/Date</label>
+    <input id="i1_date" placeholder="e.g. Jan 2024 (1 Month)" />
+    <label>Internship 1 - Point 1</label>
+    <input id="i1_p1" placeholder="Description point 1" />
+    <label>Internship 1 - Point 2</label>
+    <input id="i1_p2" placeholder="Description point 2" />
+
+    <hr style="border-top:1px dashed #ddd; margin:1rem 0;">
+
+    <!-- Internship 2 -->
+    <label>Internship 2 Title (Company – Role)</label>
+    <input id="i2_title" placeholder="NSIC – IoT & Sensor Training" />
+    <label>Internship 2 Timeline/Date</label>
+    <input id="i2_date" placeholder="e.g. Jun 2024 (1 Week)" />
+    <label>Internship 2 - Point 1</label>
+    <input id="i2_p1" placeholder="Description point 1" />
+    <label>Internship 2 - Point 2</label>
+    <input id="i2_p2" placeholder="Description point 2" />
+
+    <h2>Certifications (comma separated)</h2>
+    <textarea id="f_certifications" placeholder="e.g. JSP Hospital Internship Certificate, Symposium Certificate, IoT Workshop"></textarea>
+
+    <button class="btn" onclick="updateResume()">Preview Resume</button>
+  </div>
+
+  <!-- ===== PREVIEW ===== -->
+  <div class="card">
+    <div id="resume" class="resume">
+      <!-- LEFT COLUMN -->
+      <div class="left">
+        <div class="name" id="r_name">Your Name</div>
+        <p id="r_headline">Your Headline</p>
+        <hr>
+
+        <div class="section">
+          <h3>Contact</h3>
+          <p><span class="icon">📞</span> <span id="r_phone"></span></p>
+          <p><span class="icon">✉️</span> <span id="r_email"></span></p>
+          <p><span class="icon">📍</span> <span id="r_location"></span></p>
+          <p id="r_github" style="display:none;"><span class="icon">💼</span> <span id="r_github_val"></span></p>
+          <p id="r_linkedin" style="display:none;"><span class="icon">🔗</span> <span id="r_linkedin_val"></span></p>
+        </div>
+
+        <div class="section">
+          <h3>Summary</h3>
+          <p id="r_summary"></p>
+        </div>
+
+        <div class="section">
+          <h3>Technical Skills</h3>
+          <ul id="r_techskills"></ul>
+        </div>
+
+        <div class="section">
+          <h3>Soft Skills</h3>
+          <ul id="r_softskills"></ul>
+        </div>
+
+        <div class="section">
+          <h3>Languages</h3>
+          <ul id="r_languages"></ul>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="right">
+        <div class="section">
+          <h3>Projects</h3>
+
+          <div id="proj1">
+            <p><strong id="r_p1_title"></strong> <span class="date" id="r_p1_date"></span></p>
+            <ul id="r_p1_points"></ul>
+          </div>
+
+          <div id="proj2">
+            <p><strong id="r_p2_title"></strong> <span class="date" id="r_p2_date"></span></p>
+            <ul id="r_p2_points"></ul>
+          </div>
+
+          <div id="proj3" style="display:none;">
+            <p><strong id="r_p3_title"></strong> <span class="date" id="r_p3_date"></span></p>
+            <ul id="r_p3_points"></ul>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Education</h3>
+          <p id="r_education"></p>
+        </div>
+
+        <div class="section">
+          <h3>Course Work</h3>
+          <ul id="r_coursework"></ul>
+        </div>
+
+        <div class="section">
+          <h3>Internships</h3>
+
+          <div id="int1">
+            <p><strong id="r_i1_title"></strong> <span class="date" id="r_i1_date"></span></p>
+            <ul id="r_i1_points"></ul>
+          </div>
+
+          <div id="int2">
+            <p><strong id="r_i2_title"></strong> <span class="date" id="r_i2_date"></span></p>
+            <ul id="r_i2_points"></ul>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Certifications</h3>
+          <ul id="r_certifications"></ul>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn" onclick="downloadPDF()">Download PDF</button>
+  </div>
+</div>
+
+<script>
+let project3Visible = false;
+
+function toggleProject3() {
+  project3Visible = !project3Visible;
+  document.getElementById('project3_block').classList.toggle('hidden', !project3Visible);
+}
+
+function listFromComma(srcId, targetId) {
+  const ul = document.getElementById(targetId);
+  ul.innerHTML = '';
+  const val = document.getElementById(srcId).value.split(',').map(x => x.trim()).filter(Boolean);
+  val.forEach(item => {
+    const li = document.createElement('li');
+    li.innerText = item;
+    ul.appendChild(li);
+  });
+}
+
+function addBulletPoints(arr, targetUlId){
+  const ul = document.getElementById(targetUlId);
+  ul.innerHTML = '';
+  arr.filter(Boolean).forEach(pt => {
+    const li = document.createElement('li');
+    li.textContent = pt;
+    ul.appendChild(li);
+  });
+}
+
+function updateResume(){
+  // Left
+  document.getElementById('r_name').textContent = document.getElementById('f_name').value;
+  document.getElementById('r_headline').textContent = document.getElementById('f_headline').value;
+  document.getElementById('r_phone').textContent = document.getElementById('f_phone').value;
+  document.getElementById('r_email').textContent = document.getElementById('f_email').value;
+  document.getElementById('r_location').textContent = document.getElementById('f_location').value;
+
+  const gh = document.getElementById('f_github').value.trim();
+  const ghWrap = document.getElementById('r_github');
+  const ghVal = document.getElementById('r_github_val');
+  if(gh){
+    ghWrap.style.display = 'block';
+    ghVal.innerHTML = '<a href="'+gh+'" target="_blank">'+gh+'</a>';
+  }else{
+    ghWrap.style.display = 'none';
+    ghVal.innerHTML = '';
+  }
+
+  const li = document.getElementById('f_linkedin').value.trim();
+  const liWrap = document.getElementById('r_linkedin');
+  const liVal = document.getElementById('r_linkedin_val');
+  if(li){
+    liWrap.style.display = 'block';
+    liVal.innerHTML = '<a href="'+li+'" target="_blank">'+li+'</a>';
+  }else{
+    liWrap.style.display = 'none';
+    liVal.innerHTML = '';
+  }
+
+  document.getElementById('r_summary').textContent = document.getElementById('f_summary').value;
+
+  listFromComma('f_techskills', 'r_techskills');
+  listFromComma('f_softskills', 'r_softskills');
+  listFromComma('f_languages', 'r_languages');
+
+  // Projects
+  document.getElementById('r_p1_title').textContent = document.getElementById('p1_title').value;
+  document.getElementById('r_p1_date').textContent = document.getElementById('p1_date').value;
+  addBulletPoints([
+    document.getElementById('p1_p1').value,
+    document.getElementById('p1_p2').value
+  ], 'r_p1_points');
+
+  document.getElementById('r_p2_title').textContent = document.getElementById('p2_title').value;
+  document.getElementById('r_p2_date').textContent = document.getElementById('p2_date').value;
+  addBulletPoints([
+    document.getElementById('p2_p1').value,
+    document.getElementById('p2_p2').value
+  ], 'r_p2_points');
+
+  // Project 3 (optional)
+  const p3_title = document.getElementById('p3_title') ? document.getElementById('p3_title').value.trim() : '';
+  const p3_date  = document.getElementById('p3_date')  ? document.getElementById('p3_date').value.trim()  : '';
+  const p3_p1    = document.getElementById('p3_p1')    ? document.getElementById('p3_p1').value.trim()    : '';
+  const p3_p2    = document.getElementById('p3_p2')    ? document.getElementById('p3_p2').value.trim()    : '';
+
+  const proj3 = document.getElementById('proj3');
+  if(p3_title || p3_date || p3_p1 || p3_p2){
+    proj3.style.display = 'block';
+    document.getElementById('r_p3_title').textContent = p3_title;
+    document.getElementById('r_p3_date').textContent = p3_date;
+    addBulletPoints([p3_p1, p3_p2], 'r_p3_points');
+  }else{
+    proj3.style.display = 'none';
+  }
+
+  // Education
+  document.getElementById('r_education').textContent = document.getElementById('f_education').value;
+
+  // Course work
+  listFromComma('f_coursework', 'r_coursework');
+
+  // Internships
+  document.getElementById('r_i1_title').textContent = document.getElementById('i1_title').value;
+  document.getElementById('r_i1_date').textContent  = document.getElementById('i1_date').value;
+  addBulletPoints([
+    document.getElementById('i1_p1').value,
+    document.getElementById('i1_p2').value
+  ], 'r_i1_points');
+
+  document.getElementById('r_i2_title').textContent = document.getElementById('i2_title').value;
+  document.getElementById('r_i2_date').textContent  = document.getElementById('i2_date').value;
+  addBulletPoints([
+    document.getElementById('i2_p1').value,
+    document.getElementById('i2_p2').value
+  ], 'r_i2_points');
+
+  // Certifications
+  listFromComma('f_certifications', 'r_certifications');
+}
+
+function downloadPDF(){
+  updateResume();
+  const el = document.getElementById('resume');
+  const opt = {
+    margin: 0,
+    filename: 'Resume.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+  };
+  window.scrollTo(0,0);
+  html2pdf().set(opt).from(el).save();
+}
+
+// auto-update on typing for quick preview
+document.addEventListener('input', (e) => {
+  const ids = ['f_name','f_headline','f_phone','f_email','f_location','f_github','f_linkedin','f_summary',
+    'f_techskills','f_softskills','f_languages','p1_title','p1_date','p1_p1','p1_p2','p2_title','p2_date','p2_p1','p2_p2',
+    'p3_title','p3_date','p3_p1','p3_p2','f_education','f_coursework','i1_title','i1_date','i1_p1','i1_p2',
+    'i2_title','i2_date','i2_p1','i2_p2','f_certifications'];
+  if(ids.includes(e.target.id)) updateResume();
+});
+
+// init
+updateResume();
+</script>
+</body>
+</html>
